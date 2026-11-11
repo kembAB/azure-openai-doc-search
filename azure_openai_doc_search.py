@@ -33,8 +33,21 @@ def chunk_documents(documents, size=2):  # a function that cuts documents into s
 CHUNKS = chunk_documents(DOCUMENTS)  # run the chunking once and keep the result for the whole program
 
 # ---------- PART 2: EMBEDDINGS - TURN TEXT INTO NUMBERS ----------
-def words_of(text):  # a function that breaks text into single words
-    return re.findall(r"[a-z0-9]+", text.lower())  # find every word or number, all in small letters
+STOPWORDS = {  # small function words that carry no topic: matching ignores them, so only content words decide
+    "the", "a", "an", "is", "are", "was", "were", "what", "how", "many", "much",
+    "do", "does", "did", "can", "could", "to", "of", "in", "on", "for", "and", "or",
+    "be", "been", "it", "its", "i", "you", "we", "they", "he", "she",
+}  # end of the stopword list
+
+def words_of(text):  # a function that breaks text into single content words
+    words = []  # the cleaned words, in order
+    for word in re.findall(r"[a-z0-9]+", text.lower()):  # find every word or number, all in small letters
+        if word in STOPWORDS:  # skip the function words that carry no topic
+            continue  # move on to the next word
+        if len(word) > 3 and word.endswith("s"):  # a light stem, so customers and customer count as the same word
+            word = word[:-1]  # drop the trailing s
+        words.append(word)  # keep the cleaned word
+    return words  # hand back the content words
 
 VOCABULARY = sorted({word for chunk in CHUNKS for word in words_of(chunk["text"])})  # every different word in all chunks, sorted
 
@@ -71,11 +84,14 @@ def search(question, top_k=2):  # a function that finds the chunks closest in me
 def generate_answer(question, chunks):  # a function that builds an answer using only the found chunks
     # In production this sends the chunks plus the question to an Azure OpenAI chat model, told to answer from the context only  # the real setup
     question_words = set(words_of(question))  # the question's words as a set, so repeats vanish
+    sentences = [sentence.strip() for chunk in chunks for sentence in chunk["text"].split(". ")]  # every sentence in the found chunks
     best_sentences = []  # an empty list for the sentences that will form the answer
-    for chunk in chunks:  # loop over the found chunks
-        for sentence in chunk["text"].split(". "):  # look at each sentence inside the chunk
-            overlap = len(question_words & set(words_of(sentence)))  # count how many question words the sentence shares
-            best_sentences.append((overlap, sentence.strip()))  # keep the sentence with its overlap score
+    for sentence in sentences:  # look at each sentence inside the chunks
+        overlap = 0.0  # this sentence's score, built from the words it shares with the question
+        for word in question_words & set(words_of(sentence)):  # loop over the shared words only
+            carriers = sum(1 for other in sentences if word in words_of(other))  # count how many sentences carry this word
+            overlap += 1.0 / carriers  # a rare shared word proves more than a common one, so it counts more
+        best_sentences.append((overlap, sentence))  # keep the sentence with its weighted score
     best_sentences.sort(key=lambda pair: pair[0], reverse=True)  # sort so the most relevant sentence comes first
     chosen = [sentence for overlap, sentence in best_sentences[:2] if overlap > 0]  # take the best two sentences that truly overlap
     answer = ". ".join(chosen)  # join the chosen sentences into one answer text
