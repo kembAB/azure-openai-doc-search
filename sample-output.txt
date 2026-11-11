@@ -1,0 +1,16 @@
+=== DEMO: ASK THE DOCUMENTS A QUESTION ===
+Found in Leave Policy -> Full-time employees receive 20 vacation days each year. Employees may carry over up to 5 unused vacation days into the next year.
+Found in Leave Policy -> Sick leave is separate and provides 10 days per year.
+Answer: Full-time employees receive 20 vacation days each year. Employees may carry over up to 5 unused vacation days into the next year.
+
+=== VALIDATION: PREDEFINED TEST QUERIES CHECKED AGAINST THE SOURCES ===
+Q: How many vacation days do employees receive each year?
+A: Full-time employees receive 20 vacation days each year. Employees may carry over up to 5 unused vacation days into the next year.
+Expected fact present: True | Grounded in sources: True | TEST PASS
+Q: How many days do customers have to return a product?
+A: Customers may return any product within 30 days of purchase for a full refund. Refunds are issued to the original payment method within 7 business days.
+Expected fact present: True | Grounded in sources: True | TEST PASS
+Q: How often must passwords be changed?
+A: Passwords must be changed every 90 days. Each password must contain at least 12 characters with one number and one symbol.
+Expected fact present: True | Grounded in sources: True | TEST PASS
+Validation: 3 of 3 tests passed - answers checked against source documents, no invented facts.
