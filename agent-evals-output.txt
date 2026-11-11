@@ -1,0 +1,56 @@
+########## AGENT DEMO (python3 agent.py) ##########
+======================================================================
+  PLAN: answer from the documents only, verify before replying. Question: How many vacation days do employees receive each year?
+  SEARCH (top 2): found 2 chunk(s)
+  COVERAGE: 100% of the question's content words appear in the found chunks
+  ANSWER DRAFT: Full-time employees receive 20 vacation days each year. Employees may carry over up to 5 unused vacation days into the next year.
+  CHECK: grounded in sources = True
+  DECISION: reply with status ok, sources ['Leave Policy']
+ FINAL ANSWER: Full-time employees receive 20 vacation days each year. Employees may carry over up to 5 unused vacation days into the next year.
+ STATUS: ok | GROUNDED: True | SOURCES: ['Leave Policy']
+======================================================================
+  PLAN: answer from the documents only, verify before replying. Question: How many days do customers have to return a product?
+  SEARCH (top 2): found 2 chunk(s)
+  COVERAGE: 80% of the question's content words appear in the found chunks
+  ANSWER DRAFT: Customers may return any product within 30 days of purchase for a full refund. Refunds are issued to the original payment method within 7 business days.
+  CHECK: grounded in sources = True
+  DECISION: reply with status ok, sources ['Leave Policy', 'Refund Policy']
+ FINAL ANSWER: Customers may return any product within 30 days of purchase for a full refund. Refunds are issued to the original payment method within 7 business days.
+ STATUS: ok | GROUNDED: True | SOURCES: ['Leave Policy', 'Refund Policy']
+======================================================================
+  PLAN: answer from the documents only, verify before replying. Question: What is the CEO's salary?
+  SEARCH (top 2): found 0 chunk(s)
+  DECISION: no source material, so no answer may be given
+ FINAL ANSWER: (none - not in the documents)
+ STATUS: not_in_documents | GROUNDED: False | SOURCES: []
+
+########## EVALS (python3 evals.py) ##########
+=== EVALS: DOCUMENT AGENT ===
+[PASS] How many vacation days do employees receive each year?
+       answer: Full-time employees receive 20 vacation days each year. Employees may carry over up to 5 unused vacation days into the next year.
+[PASS] How many sick days do employees get?
+       answer: Sick leave is separate and provides 10 days per year.. Full-time employees receive 20 vacation days each year.
+[PASS] How many vacation days can be carried over?
+       answer: Employees may carry over up to 5 unused vacation days into the next year.. Full-time employees receive 20 vacation days each year.
+[PASS] How many days do customers have to return a product?
+       answer: Customers may return any product within 30 days of purchase for a full refund. Refunds are issued to the original payment method within 7 business days.
+[PASS] How long do refunds take to reach the customer?
+       answer: Customers may return any product within 30 days of purchase for a full refund. Refunds are issued to the original payment method within 7 business days.
+[PASS] Can opened software be returned?
+       answer: Opened software licenses cannot be returned.
+[PASS] How often must passwords be changed?
+       answer: Passwords must be changed every 90 days. Each password must contain at least 12 characters with one number and one symbol.
+[PASS] How long must a password be?
+       answer: Passwords must be changed every 90 days. Each password must contain at least 12 characters with one number and one symbol.
+[PASS] How many failed sign-ins lock an account?
+       answer: Accounts lock after 5 failed sign-in attempts.
+[PASS] What is the CEO's salary?
+       answer: (refused - not in the documents)
+[PASS] What is the office Wi-Fi password?
+       answer: (refused - not in the documents)
+EVAL RESULT: 11 of 11 passed (100%)
+
+########## API (python3 api.py, live curl tests) ##########
+GET /health -> {"status": "ok", "service": "azure-openai-doc-search"}
+GET /ask?q=How many vacation days do employees receive each year? -> {"answer": "Full-time employees receive 20 vacation days each year. Employees may carry over up to 5 unused vacation days into the next year.", "status": "ok", "grounded": true, "sources": ["Leave Policy"]}
+GET /ask?q=What is the CEO salary? -> {"answer": null, "status": "not_in_documents", "grounded": false, "sources": []}
