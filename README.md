@@ -1,6 +1,6 @@
 # Azure OpenAI Document Processing & Semantic Search
 
-A working demonstration of the AI architecture I shipped to production at BNY Mellon:
+A working demonstration of the AI architecture I shipped to production
 AI-powered document processing and semantic search built on Azure OpenAI — extended here
 with an agentic layer, an automated eval suite, and a REST API, the three shapes most of
 my current AI work takes.
